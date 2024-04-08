@@ -1,12 +1,21 @@
-import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-import '../api_keys.dart' as key;
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
+
+import '../api_keys.dart';
 
 class NewsModel {
-  var url = Uri.parse(
-      'https://newsapi.org/v2/top-headlines/sources?apiKey=${key.apiKey}');
+  String country = '';
+
   Future<void> getNews() async {
-    var res = await http.get(url);
-    print(res.body);
+    var currentLocation = await Location().getLocation();
+    var newsUrl = Uri.parse(
+        'https://newsapi.org/v2/top-headlines?country=in&category=sports&q=football&apiKey=${ApiKeys().newsApiKey}');
+    var locationIqUrl = Uri.parse(
+        'https://us1.locationiq.com/v1/reverse?key=${ApiKeys().locationIqApiKey}&lat=${currentLocation.latitude}&lon=${currentLocation.longitude}&format=json');
+    var newsRes = await http.get(newsUrl);
+    var locationRes = await http.get(locationIqUrl);
+    print(json.decode(locationRes.body)['address']['city']);
   }
 }
